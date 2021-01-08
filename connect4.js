@@ -86,6 +86,18 @@ function findSpotForCol(x) {
   }, null);
 }
 
+
+function animatePiece(y, x) {
+  let i = 0;
+  piece = placeInTable(0, x);
+
+  animation = setInterval(() => {
+    i++;
+    piece.remove();
+    addToTable(peice, i, x);
+    if (i === y) clearInterval(animation);
+  }, 500);
+}
 /** placeInTable: update DOM to place piece into HTML table of board */
 
 function placeInTable(y, x) {
@@ -95,10 +107,11 @@ function placeInTable(y, x) {
   piece.classList.add('piece', 'p' + currPlayer);
   // insert into correct table cell
   document.getElementById(`${y}-${x}`).append(piece);
+  return piece;
 }
 
-function removeFromTable(y, x) {
-
+function addToTable(piece, y, x) {
+  document.getElementById(`${y}-${x}`).append(piece);
 }
 
 /** endGame: announce game end */
@@ -124,8 +137,8 @@ function handleClick(evt) {
   }
 
   // place piece in board and add to HTML table
-  // TODO: add line to update in-memory board
-  placeInTable(y, x);
+  animatePiece(y, x);
+  //update in-memory board
   board[y][x] = currPlayer;
 
   // check for win
