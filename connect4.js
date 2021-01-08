@@ -164,7 +164,7 @@ function checkForWin() {
 
   // TODO: read and understand this code. Add comments to help you.
   // loop through every y and x coordinate from 0 to height or width
-  repeat(HIEGHT, (y) => {
+  repeat(HEIGHT, (y) => {
     repeat(WIDTH, (x) => {
       // make a set of coordinates for every direction from the x and y coordinates you are on
       const horiz = [[y, x], [y, x + 1], [y, x + 2], [y, x + 3]];
