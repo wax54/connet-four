@@ -7,6 +7,7 @@
 
 const WIDTH = 7;
 const HEIGHT = 6;
+const DROPSPEED = 200;
 
 let currPlayer = 1; // active player: 1 or 2
 let gameOver = false;
@@ -50,7 +51,9 @@ function makeHtmlBoard() {
   const top = document.createElement("tr");
   top.setAttribute("id", "column-top");
   top.addEventListener("click", handleClick);
-
+  top.addEventListener("mouseover", handleHover);
+  top.addEventListener("mouseout", handleHoverOut);
+  
   //creating the individual td's in the top row of the board
   repeat(WIDTH, (x) => {
     const headCell = document.createElement("td");
@@ -78,6 +81,23 @@ function makeHtmlBoard() {
   });
 }
 
+/**
+ * adds a piece of the correct color to the board when hovering over the top pieces 
+ */
+
+function handleHover(evt) {
+  //if the game has already ended, no more hovers
+  if (gameOver) return;
+
+  // get x from ID of clicked cell
+  const activeColumn = evt.target;
+  const piece = createPiece();
+  activeColumn.append(piece);
+}
+function handleHoverOut(evt) {
+  evt.target.innerHTML = '';
+}
+
 /** findSpotForCol: given column x, return top empty y (null if filled) */
 
 function findSpotForCol(x) {
@@ -89,25 +109,31 @@ function findSpotForCol(x) {
 
 function animatePiece(y, x) {
   let i = 0;
-  piece = placeInTable(0, x);
-
-  animation = setInterval(() => {
-    i++;
+  const piece = createPiece();
+  const animation = setInterval(() => {
     piece.remove();
-    addToTable(peice, i, x);
+    addToTable(piece, i, x);
     if (i === y) clearInterval(animation);
-  }, 500);
+    i++;
+  }, DROPSPEED);
 }
-/** placeInTable: update DOM to place piece into HTML table of board */
 
-function placeInTable(y, x) {
+/** placeInTable: update DOM to place piece into HTML table of board */
+function createPiece() {
   // make a div named piece
   const piece = document.createElement('div');
   // add the classes based on whose turn it is
   piece.classList.add('piece', 'p' + currPlayer);
+  //returns the peice so we can remove it later
+  return piece;
+}
+
+function placeInTable(y, x) {
+  // make a div named piece
+  const piece = createPiece();
   // insert into correct table cell
   document.getElementById(`${y}-${x}`).append(piece);
-  return piece;
+
 }
 
 function addToTable(piece, y, x) {
@@ -116,9 +142,9 @@ function addToTable(piece, y, x) {
 
 /** endGame: announce game end */
 
-function endGame(msg) {
+function endGame(msg, wait = DROPSPEED) {
   gameOver = true;
-  setTimeout(() => { alert(msg) }, 300);
+  setTimeout(() => { alert(msg) }, wait);
 }
 
 /** handleClick: handle click of column top to play piece */
@@ -143,7 +169,7 @@ function handleClick(evt) {
 
   // check for win
   if (checkForWin()) {
-    return endGame(`Player ${currPlayer} won!`);
+    endGame(`Player ${currPlayer} won!`, (y + 2) * DROPSPEED);
   }
 
   // check for tie
@@ -175,10 +201,10 @@ function checkForWin() {
     );
   }
 
-  // TODO: read and understand this code. Add comments to help you.
-  // loop through every y and x coordinate from 0 to height or width
-  repeat(HEIGHT, (y) => {
-    repeat(WIDTH, (x) => {
+  // loop through every y coordinate from 0 to HEIGHT
+  for (let y = 0; y < HEIGHT; y++) {
+    // loop through every x coordinate from 0 to WIDTH
+    for (let x = 0; x < WIDTH; x++) {
       // make a set of coordinates for every direction from the x and y coordinates you are on
       const horiz = [[y, x], [y, x + 1], [y, x + 2], [y, x + 3]];
       const vert = [[y, x], [y + 1, x], [y + 2, x], [y + 3, x]];
@@ -189,8 +215,8 @@ function checkForWin() {
         //if any of them are a win, return true
         return true;
       }
-    });
-  });
+    }
+  }
   return false;
 }
 
