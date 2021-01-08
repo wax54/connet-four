@@ -5,9 +5,9 @@
  * board fills (tie)
  */
 
-const WIDTH = 7;
-const HEIGHT = 6;
-const DROPSPEED = 200;
+let WIDTH = 7;
+let HEIGHT = 6;
+let DROPSPEED = 200;
 
 let currPlayer = 1; // active player: 1 or 2
 let gameOver = false;
@@ -27,12 +27,26 @@ function makeBoard() {
   });
 }
 
+function resetGame() {
+  board.length = 0;
+  gameOver = false;
+  makeBoard();
+  resetHTMLBoard();
+}
+
+function resetHTMLBoard() {
+  const htmlBoard = document.getElementById("board");
+  htmlBoard.innerHTML = 0;
+  makeHtmlBoard();
+}
+
+
 /**
  * repeats a function itertations times. each time the function is run, it is passed the iteration it is on,
  *    and all the other params passed in to the repeat function
  *
  * @param {number} iterations how many times do you want the selected function repeated
- * @param {*} func the function to repeat
+ * @param { function } func the function to repeat
  * @param  {...any} rest other paramaters you want passed into the repeated function
  */
 
@@ -51,9 +65,9 @@ function makeHtmlBoard() {
   const top = document.createElement("tr");
   top.setAttribute("id", "column-top");
   top.addEventListener("click", handleClick);
-  top.addEventListener("mouseover", handleHover);
-  top.addEventListener("mouseout", handleHoverOut);
-  
+  top.addEventListener("mouseover", handleMouseIn);
+  top.addEventListener("mouseout", handleMouseOut);
+
   //creating the individual td's in the top row of the board
   repeat(WIDTH, (x) => {
     const headCell = document.createElement("td");
@@ -85,7 +99,7 @@ function makeHtmlBoard() {
  * adds a piece of the correct color to the board when hovering over the top pieces 
  */
 
-function handleHover(evt) {
+function handleMouseIn(evt) {
   //if the game has already ended, no more hovers
   if (gameOver) return;
 
@@ -94,7 +108,7 @@ function handleHover(evt) {
   const piece = createPiece();
   activeColumn.append(piece);
 }
-function handleHoverOut(evt) {
+function handleMouseOut(evt) {
   evt.target.innerHTML = '';
 }
 
@@ -108,6 +122,7 @@ function findSpotForCol(x) {
 
 
 function animatePiece(y, x) {
+  console.log('y', y, 'x', x);
   let i = 0;
   const piece = createPiece();
   const animation = setInterval(() => {
@@ -142,9 +157,9 @@ function addToTable(piece, y, x) {
 
 /** endGame: announce game end */
 
-function endGame(msg, wait = DROPSPEED) {
+function endGame(msg, wait = 2) {
   gameOver = true;
-  setTimeout(() => { alert(msg) }, wait);
+  setTimeout(() => { alert(msg) }, DROPSPEED * wait);
 }
 
 /** handleClick: handle click of column top to play piece */
@@ -153,6 +168,7 @@ function handleClick(evt) {
   //if the game has already ended, no more clicks
   if (gameOver) return;
 
+  console.log('handleClick', evt);
   // get x from ID of clicked cell
   const x = +evt.target.id;
 
@@ -161,7 +177,6 @@ function handleClick(evt) {
   if (y === null) {
     return;
   }
-
   // place piece in board and add to HTML table
   animatePiece(y, x);
   //update in-memory board
@@ -169,7 +184,7 @@ function handleClick(evt) {
 
   // check for win
   if (checkForWin()) {
-    endGame(`Player ${currPlayer} won!`, (y + 2) * DROPSPEED);
+    endGame(`Player ${currPlayer} won!`, (y + 2));
   }
 
   // check for tie
@@ -178,6 +193,8 @@ function handleClick(evt) {
   }
   // switch players
   currPlayer === 1 ? currPlayer = 2 : currPlayer = 1;
+  handleMouseOut(evt);
+  handleMouseIn(evt);
 }
 
 function checkForTie() {
@@ -226,3 +243,6 @@ function checkForWin() {
 makeBoard();
 // make the board for the user
 makeHtmlBoard();
+// assign click event to restart button
+const restart = document.getElementById('restart');
+restart.addEventListener('click', resetGame)
