@@ -122,7 +122,6 @@ function findSpotForCol(x) {
 
 
 function animatePiece(y, x) {
-  console.log('y', y, 'x', x);
   let i = 0;
   const piece = createPiece();
   const animation = setInterval(() => {
@@ -168,10 +167,10 @@ function handleClick(evt) {
   //if the game has already ended, no more clicks
   if (gameOver) return;
 
-  console.log('handleClick', evt);
   // get x from ID of clicked cell
   const x = +evt.target.id;
-
+  //the collumn top itself was clicked, return
+  if (isNaN(x)) return;
   // get next spot in column (if none, ignore click)
   const y = findSpotForCol(x);
   if (y === null) {
@@ -237,12 +236,41 @@ function checkForWin() {
   return false;
 }
 
-
+function updateWidth() {
+  const widthInput = document.getElementById('width');
+  WIDTH = +widthInput.value;
+}
+function updateHeight() {
+  const heightInput = document.getElementById('height');
+  HEIGHT = +heightInput.value;
+}
 
 // make the board variable
 makeBoard();
 // make the board for the user
 makeHtmlBoard();
+
 // assign click event to restart button
-const restart = document.getElementById('restart');
-restart.addEventListener('click', resetGame)
+document.getElementById('restart')
+  .addEventListener('click', resetGame);
+
+document.getElementById('height')
+  .addEventListener('change', () => {
+    if (board.every((row) => row.every((cell) => cell == null))) {
+      updateHeight();
+      resetGame();
+    } else {
+      const userNote = document.getElementById('user-note');
+      userNote.innerText = 'Update Will Take Place Next Game.';
+    }
+  });
+document.getElementById('width')
+  .addEventListener('change', () => {
+    if (board.every((row) => row.every((cell) => cell == null))) {
+      updateWidth();
+      resetGame();
+    } else {
+      const userNote = document.getElementById('user-note');
+      userNote.innerText = 'Update Will Take Place Next Game.';
+    }
+  });
