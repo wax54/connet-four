@@ -30,13 +30,16 @@ function makeBoard() {
 function resetGame() {
   board.length = 0;
   gameOver = false;
+  updateHeight();
+  updateWidth();
+
   makeBoard();
   resetHTMLBoard();
 }
 
 function resetHTMLBoard() {
   const htmlBoard = document.getElementById("board");
-  htmlBoard.innerHTML = 0;
+  htmlBoard.innerHTML = '';
   makeHtmlBoard();
 }
 
