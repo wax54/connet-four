@@ -131,8 +131,8 @@ function animatePiece(y, x) {
   const piece = createPiece();
   playBlip();
   const animation = setInterval(() => {
-    piece.remove();
     playBlip();
+    piece.remove();
     addToTable(piece, i, x);
     if (i === y) {
       clearInterval(animation);
