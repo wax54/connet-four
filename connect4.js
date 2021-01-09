@@ -163,6 +163,14 @@ function placeInTable(y, x) {
 function addToTable(piece, y, x) {
   document.getElementById(`${y}-${x}`).append(piece);
 }
+/**
+ * Removes all the x-y coordinates in winningPoints from the htmlboard and from the in-memory board
+ *  also should make the pieces above fall and check for win again at the end
+ * 
+ */
+removeWinnerFromTable(winningPoints){
+
+}
 
 /** endGame: announce game end */
 
@@ -196,9 +204,8 @@ function handleClick(evt) {
 
   // check for win
   if (checkForWin()) {
-    currPlayer === 1 ?
-      endGame(`Red won!`, (y + 2)) :
-      endGame(`Blue won!`, (y + 2));
+    const winner = checkForWin(); //returns an array that contains all the points of the winner
+    removeWinnerFromTable(winner);
   }
 
   // check for tie
@@ -237,14 +244,19 @@ function checkForWin() {
     // loop through every x coordinate from 0 to WIDTH
     for (let x = 0; x < WIDTH; x++) {
       // make a set of coordinates for every direction from the x and y coordinates you are on
-      const horiz = [[y, x], [y, x + 1], [y, x + 2], [y, x + 3]];
-      const vert = [[y, x], [y + 1, x], [y + 2, x], [y + 3, x]];
-      const diagDR = [[y, x], [y + 1, x + 1], [y + 2, x + 2], [y + 3, x + 3]];
-      const diagDL = [[y, x], [y + 1, x - 1], [y + 2, x - 2], [y + 3, x - 3]];
+      const possibilities = [
+        [[y, x], [y, x + 1], [y, x + 2], [y, x + 3]], //horiz
+        [[y, x], [y + 1, x], [y + 2, x], [y + 3, x]], //vert
+        [[y, x], [y + 1, x + 1], [y + 2, x + 2], [y + 3, x + 3]], //diagDR
+        [[y, x], [y + 1, x - 1], [y + 2, x - 2], [y + 3, x - 3]] //diagDL
+      ];
       // check every pattern from the current coordinate pair for a win
-      if (_win(horiz) || _win(vert) || _win(diagDR) || _win(diagDL)) {
-        //if any of them are a win, return true
-        return true;
+      const winners = possibilities.filter((path) => _win(path));
+
+      console.log(winners);
+      if (winners.length) {
+        //if any of them are a win, return the winners
+        return winners[0];
       }
     }
   }
