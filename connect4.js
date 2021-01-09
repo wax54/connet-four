@@ -13,6 +13,7 @@ let currPlayer = 1; // active player: 1 or 2
 let gameOver = false;
 const board = []; // array of rows, each row is array of cells  (board[y][x])
 
+
 /** makeBoard: create in-JS board structure:
  *    board = array of rows, each row is array of cells  (board[y][x])
  */
@@ -127,10 +128,15 @@ function findSpotForCol(x) {
 function animatePiece(y, x) {
   let i = 0;
   const piece = createPiece();
+  playBlip();
   const animation = setInterval(() => {
     piece.remove();
+    playBlip();
     addToTable(piece, i, x);
-    if (i === y) clearInterval(animation);
+    if (i === y) {
+      clearInterval(animation);
+      playCrash();
+    }
     i++;
   }, DROPSPEED);
 }
@@ -161,7 +167,10 @@ function addToTable(piece, y, x) {
 
 function endGame(msg, wait = 2) {
   gameOver = true;
-  setTimeout(() => { alert(msg) }, DROPSPEED * wait);
+  setTimeout(playXylo, DROPSPEED * (wait - 1));
+  setTimeout(() => {
+    alert(msg)
+  }, DROPSPEED * wait);
 }
 
 /** handleClick: handle click of column top to play piece */
@@ -186,7 +195,9 @@ function handleClick(evt) {
 
   // check for win
   if (checkForWin()) {
-    endGame(`Player ${currPlayer} won!`, (y + 2));
+    currPlayer === 1 ?
+      endGame(`Red won!`, (y + 2)) :
+      endGame(`Blue won!`, (y + 2));
   }
 
   // check for tie
@@ -247,6 +258,20 @@ function updateHeight() {
   const heightInput = document.getElementById('height');
   HEIGHT = +heightInput.value;
 }
+
+const playBlip = () => {
+  const blip = new Audio('Blip.ogg');
+  blip.play()
+};
+const playCrash = () => {
+  const crash = new Audio('Slick.ogg');
+  crash.play()
+};
+const playXylo = () => {
+  const Xylo = new Audio('Xylo.ogg');
+  Xylo.play()
+};
+
 
 // make the board variable
 makeBoard();
