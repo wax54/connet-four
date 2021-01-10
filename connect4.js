@@ -16,6 +16,66 @@ let gameOver = false; //changes to true when the game ends
 const board = []; // array of rows, each row is array of cells  (board[y][x])
 
 
+/** handleClick: handle click of column top to play piece */
+function handleClick(evt) {
+  //if the game has already ended, no more clicks
+  if (gameOver) return;
+
+  // get x from ID of clicked cell
+  const x = +evt.target.id;
+  //the collumn top itself was clicked, return
+  if (isNaN(x)) return;
+  // get next spot in column (if none, ignore click)
+  const y = findSpotForCol(x);
+  if (y === null) {
+    return;
+  }
+  // place piece in board and add to HTML table
+  animatePiece(y, x);
+  //update in-memory board
+  board[y][x] = currPlayer;
+
+  // check for win
+  if (checkForWin()) {
+    currPlayer === 1 ?
+      endGame(`Red won!`, (y + 2)) : //if 1
+      endGame(`Blue won!`, (y + 2)); //if 2
+  }
+
+  // check for tie
+  if (checkForTie()) {
+    endGame('Both Players Tied');
+  }
+  // switch players
+  currPlayer === 1 ? currPlayer = 2 : currPlayer = 1;
+
+  //resets the temp peices in the toprow to the new currPlayer color
+  handleMouseOut(evt);
+  handleMouseIn(evt);
+}
+
+/**
+ * adds a temporary piece of the correct color to the top-row when hovering over the top cells
+ */
+function handleMouseIn(evt) {
+  //if the game has already ended, no more hovers
+  if (gameOver) return;
+
+  // get x from ID of clicked cell
+  const activeColumn = evt.target;
+  //create a piece of the active color
+  const piece = createPiece();
+  //append it to the active column
+  activeColumn.append(piece);
+}
+
+/**
+ * removes the temporary peice from the top cell on mouse out
+ */
+function handleMouseOut(evt) {
+  evt.target.innerHTML = '';
+}
+
 
 /** makeBoard: create in-JS board structure:
  *    board = array of rows, each row is array of cells  (board[y][x])
@@ -97,30 +157,6 @@ function resetHTMLBoard() {
   const htmlBoard = document.getElementById("board");
   htmlBoard.innerHTML = '';
   makeHtmlBoard();
-}
-
-
-
-
-/**
- * adds a temporary piece of the correct color to the top-row when hovering over the top cells
- */
-function handleMouseIn(evt) {
-  //if the game has already ended, no more hovers
-  if (gameOver) return;
-
-  // get x from ID of clicked cell
-  const activeColumn = evt.target;
-  //create a piece of the active color
-  const piece = createPiece();
-  //append it to the active column
-  activeColumn.append(piece);
-}
-/**
- * removes the temporary peice from the top cell on mouse out
- */
-function handleMouseOut(evt) {
-  evt.target.innerHTML = '';
 }
 
 /** findSpotForCol: given column x, return top empty y (null if filled) */
@@ -208,43 +244,6 @@ function endGame(msg, wait = 2) {
   }, DROPSPEED * wait);
 }
 
-/** handleClick: handle click of column top to play piece */
-function handleClick(evt) {
-  //if the game has already ended, no more clicks
-  if (gameOver) return;
-
-  // get x from ID of clicked cell
-  const x = +evt.target.id;
-  //the collumn top itself was clicked, return
-  if (isNaN(x)) return;
-  // get next spot in column (if none, ignore click)
-  const y = findSpotForCol(x);
-  if (y === null) {
-    return;
-  }
-  // place piece in board and add to HTML table
-  animatePiece(y, x);
-  //update in-memory board
-  board[y][x] = currPlayer;
-
-  // check for win
-  if (checkForWin()) {
-    currPlayer === 1 ?
-      endGame(`Red won!`, (y + 2)) : //if 1
-      endGame(`Blue won!`, (y + 2)); //if 2
-  }
-
-  // check for tie
-  if (checkForTie()) {
-    endGame('Both Players Tied');
-  }
-  // switch players
-  currPlayer === 1 ? currPlayer = 2 : currPlayer = 1;
-
-  //resets the temp peices in the toprow to the new currPlayer color
-  handleMouseOut(evt);
-  handleMouseIn(evt);
-}
 
 /** returns whether or not every cell has been filled */
 function checkForTie() {
@@ -338,6 +337,18 @@ const playXylo = () => {
   Xylo.play()
 };
 
+
+/**
+ * repeats a function itertations times. Each time the function is run, it is passed the iteration it is on,
+ *    and all the other params passed in to the repeat function
+ *
+ * @param {number} iterations how many times do you want the selected function repeated
+ * @param { function } func the function to repeat
+ * @param  {...any} rest other paramaters you want passed into the repeated function
+ */
+function repeat(iterations, func, ...rest) {
+  for (let i = 0; i < iterations; i++) func(i, ...rest);
+}
 
 
 
