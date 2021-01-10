@@ -7,7 +7,7 @@
 
 let WIDTH = 7;
 let HEIGHT = 6;
-let DROPSPEED = 200;
+let DROPSPEED = 150;
 
 let currPlayer = 1; // active player: 1 or 2
 let gameOver = false;
@@ -261,15 +261,15 @@ function updateHeight() {
 }
 
 const playBlip = () => {
-  const blip = new Audio('Blip.ogg');
+  const blip = new Audio('Blip.mp3');
   blip.play()
-};
+}
 const playCrash = () => {
-  const crash = new Audio('Slick.ogg');
+  const crash = new Audio('Slick.mp3');
   crash.play()
 };
 const playXylo = () => {
-  const Xylo = new Audio('Xylo.ogg');
+  const Xylo = new Audio('Xylo.mp3');
   Xylo.play()
 };
 
