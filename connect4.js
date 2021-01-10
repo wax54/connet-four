@@ -116,6 +116,52 @@ function handleMouseIn(evt) {
 function handleMouseOut(evt) {
   evt.target.innerHTML = '';
 }
+/**
+ * Should make the pieces above an empty space fall
+ */
+function updateBoard() {
+  //for everycolumn check if I hit a null after I hit a token
+  let previousRow = [];
+  const badColumns = new Set();
+  repeat(WIDTH, () => { previousRow.push(null) });
+
+  for (let y in board) {
+    for (let x in board[y]) {
+      if (previousRow[x] != null) {
+        if (board[y][x] === null) {
+          badColumns.add(x);
+        }
+      }
+    }
+    previousRow = [...board[y]];
+  }
+  if (badColumns.size) {
+    setTimeout(() => {
+      playBlip();
+      badColumns.forEach(resetColumn)
+    }, DROPSPEED);
+  }
+}
+
+function resetColumn(x) {
+  //y, x should be null with pieces above
+  const col = [];
+  for (y in board) {
+    if (board[y][x]) col.push(board[y][x]);
+    board[y][x] = null;
+    emptySpace(y, x);
+  }
+
+  for (let i = col.length - 1; i >= 0; i--) {
+    const y = findSpotForCol(x);
+    // place piece into HTML table
+    const piece = createSpecificPiece(col[i]);
+    addToTable(piece, y, x);
+    //update in-memory board
+    board[y][x] = currPlayer;
+  }
+
+}
 
 /** findSpotForCol: given column x, return top empty y (null if filled) */
 
@@ -144,10 +190,14 @@ function animatePiece(y, x) {
 
 /** placeInTable: update DOM to place piece into HTML table of board */
 function createPiece() {
+  return createSpecificPiece(currPlayer)
+}
+
+function createSpecificPiece(playerId) {
   // make a div named piece
   const piece = document.createElement('div');
   // add the classes based on whose turn it is
-  piece.classList.add('piece', 'p' + currPlayer);
+  piece.classList.add('piece', 'p' + playerId);
   //returns the peice so we can remove it later
   return piece;
 }
@@ -163,12 +213,22 @@ function placeInTable(y, x) {
 function addToTable(piece, y, x) {
   document.getElementById(`${y}-${x}`).append(piece);
 }
+
+function emptySpace(y, x) {
+  document.getElementById(`${y}-${x}`).innerText = '';
+}
+
 /**
  * Removes all the x-y coordinates in winningPoints from the htmlboard and from the in-memory board
- *  also should make the pieces above fall and check for win again at the end
- * 
+ *
+ *
  */
-removeWinnerFromTable(winningPoints){
+function removeWinnerFromTable(winningPoints) {
+  playXylo();
+  winningPoints.forEach(([y, x]) => {
+    board[y][x] = null;
+    emptySpace(y, x);
+  });
 
 }
 
@@ -205,7 +265,11 @@ function handleClick(evt) {
   // check for win
   if (checkForWin()) {
     const winner = checkForWin(); //returns an array that contains all the points of the winner
-    removeWinnerFromTable(winner);
+    setTimeout(() => {
+      removeWinnerFromTable(winner)
+      updateBoard();
+      //TODO: check for win again at the end
+    }, DROPSPEED * (y + 3));
   }
 
   // check for tie
@@ -224,20 +288,27 @@ function checkForTie() {
 /** checkForWin: check board cell-by-cell for "does a win start here?" */
 
 function checkForWin() {
-  function _win(cells) {
+  const _win = (cells) => {
     // Check four cells to see if they're all color of current player
     //  - cells: list of four (y, x) cells
-    //  - returns true if all are legal coordinates & all match currPlayer
+    //  - returns true if all are legal coordinates & all match the same player
 
     return cells.every(
-      ([y, x]) =>
-        y >= 0 &&
-        y < HEIGHT &&
-        x >= 0 &&
-        x < WIDTH &&
-        board[y][x] === currPlayer
-    );
-  }
+            ([y, x]) =>
+            y >= 0 &&
+            y < HEIGHT &&
+            x >= 0 &&
+            x < WIDTH &&
+        board[y][x] === 1) ||
+      cells.every(
+        ([y, x]) =>
+          y >= 0 &&
+          y < HEIGHT &&
+          x >= 0 &&
+          x < WIDTH &&
+          board[y][x] === 2);
+  };
+
 
   // loop through every y coordinate from 0 to HEIGHT
   for (let y = 0; y < HEIGHT; y++) {
@@ -253,7 +324,6 @@ function checkForWin() {
       // check every pattern from the current coordinate pair for a win
       const winners = possibilities.filter((path) => _win(path));
 
-      console.log(winners);
       if (winners.length) {
         //if any of them are a win, return the winners
         return winners[0];
