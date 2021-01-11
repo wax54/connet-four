@@ -16,7 +16,10 @@ let gameOver = false; //changes to true when the game ends
 const board = []; // array of rows, each row is array of cells  (board[y][x])
 
 
-/** handleClick: handle click of column top to play piece */
+/** handleClick: handle click of column-top
+ *  it'll play the piece.
+ *
+*/
 function handleClick(evt) {
   //if the game has already ended, no more clicks
   if (gameOver) return;
@@ -323,17 +326,17 @@ function updateHeight() {
 
 /** plays a blip sound */
 const playBlip = () => {
-  const blip = new Audio('Blip.mp3');
+  const blip = new Audio('../Blip.mp3');
   blip.play()
 }
 /** plays a blip sound */
 const playCrash = () => {
-  const crash = new Audio('Slick.mp3');
+  const crash = new Audio('../Slick.mp3');
   crash.play()
 };
 /** plays a blip sound */
 const playXylo = () => {
-  const Xylo = new Audio('Xylo.mp3');
+  const Xylo = new Audio('../Xylo.mp3');
   Xylo.play()
 };
 
