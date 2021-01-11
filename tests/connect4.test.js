@@ -23,7 +23,15 @@ describe('handleClick', () => {
 
     });
 });
-
+describe('addToTable', () => {
+    it('should add specified piece into DOM at (y, x)', () => {
+        expect(document.getElementById('1-1').innerHTML).toEqual('');
+        const piece = createPiece();
+        addToTable(piece, 1, 1);
+        expect(document.getElementById('1-1').innerHTML).not.toEqual('');
+        piece.remove();
+    });
+});
 describe('dimensionChanged()', () => {
     it('should update the board to the new dimensions if no tokens have been played', () => {
 

@@ -223,7 +223,7 @@ function placeInTable(y, x) {
 
 
 /**
- * adds specified HTMLElement 'piece' into DOM at (x, y)
+ * adds specified HTMLElement 'piece' into DOM at (y, x)
  *
  * @param {HTMLElement} piece the piece to be added
  * @param {num} y the row the piece should be placed into
