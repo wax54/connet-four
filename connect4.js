@@ -242,7 +242,7 @@ function addToTable(piece, y, x) {
  */
 function endGame(msg, wait = 2) {
   gameOver = true; //the game is now over
-  setTimeout(playXylo, DROPSPEED * (wait - 1)); //play a nice finishing sound
+  setTimeout(playXylo, DROPSPEED * (wait - 1)); //play a nice finishing sound a little early
   setTimeout(() => {
     alert(msg)  //alert the user of msg
   }, DROPSPEED * wait);
