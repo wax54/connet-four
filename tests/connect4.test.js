@@ -6,8 +6,62 @@ describe('template', () => {
 });
 */
 
-describe('handleClick', () => {
+describe('resetGame()', () => {
+    beforeEach(() => {
+        DROPSPEED = 0;
+        handleClick({ target: document.getElementById('1') });
+
+    });
+    it('should reset the in-memory board', (done) => {
+        setTimeout(() => {
+            expect(board[5][1]).not.toEqual(null);
+            resetGame();
+            expect(board[5][1]).toEqual(null);
+            done();
+        }, 50);
+    });
+    it('should reset the currPlayer to 1', (done) => {
+        setTimeout(() => {
+            expect(currPlayer).toEqual(2);
+            resetGame();
+            expect(currPlayer).toEqual(1);
+            done();
+        }, 50);
+    });
+    it('should reset the game over variable', (done) => {
+        gameOver = true;
+        setTimeout(() => {
+            resetGame();
+            expect(gameOver).toEqual(false);
+            done();
+        }, 50);
+    });
+    it('should update the height and width', (done) => {
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        setTimeout(() => {
+            widthInput.value = 9;
+            heightInput.value = 5;
+            expect(WIDTH).toEqual(7);
+            expect(HEIGHT).toEqual(6);
+            resetGame();
+            expect(WIDTH).toEqual(9);
+            expect(HEIGHT).toEqual(5);
+            done();
+        }, 50);
+    });
+
+    afterEach(() => {
+        DROPSPEED = 200;
+        document.getElementById('width').value = 7;
+        document.getElementById('height').value = 6;
+        resetGame();
+    });
+});
+
+describe('handleClick()', () => {
     it('when evt.target.id = 1 there should be a piece in the element "5-1"', (done) => {
+        DROPSPEED = 0;
         //drop the piece
         handleClick({ target: document.getElementById('1') });
         //wait for the piece to drop
@@ -17,13 +71,13 @@ describe('handleClick', () => {
             expect(cell.innerHTML.length).not.toEqual(0);
             //#cleanUp
             resetGame();
+            DROPSPEED = 200; 
             done();
-        }, 1000);
-
+        }, 50);
 
     });
 });
-describe('addToTable', () => {
+describe('addToTable()', () => {
     it('should add specified piece into DOM at (y, x)', () => {
         expect(document.getElementById('1-1').innerHTML).toEqual('');
         const piece = createPiece();
@@ -33,6 +87,10 @@ describe('addToTable', () => {
     });
 });
 describe('dimensionChanged()', () => {
+    beforeEach(() => {
+        DROPSPEED = 0;
+    });
+
     it('should update the board to the new dimensions if no tokens have been played', () => {
 
         //testing Height
@@ -78,7 +136,7 @@ describe('dimensionChanged()', () => {
             expect(WIDTH).not.toEqual(8);
             //#done
             done();
-        }, 1000);
+        }, 15);
 
     });
     it('should update the userNote if a token has been played', (done) => {
@@ -92,12 +150,19 @@ describe('dimensionChanged()', () => {
             const note = document.getElementById('user-note').innerText;
             expect(note.length).not.toEqual(0);
             done();
-        }, 1000);
+        }, 15);
     });
     afterEach(() => {
+        DROPSPEED = 200; 
         document.getElementById('width').value = 7;
         document.getElementById('height').value = 6;
         resetGame();
+    });
+    afterAll((done) => {
+        setTimeout(() => {
+            resetGame();
+            done();
+        }, 50)
     });
 });
 describe('updateUserNote()', () => {

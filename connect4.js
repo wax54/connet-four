@@ -143,6 +143,7 @@ function makeHtmlBoard() {
  *  input for the new game
  */
 function resetGame() {
+  currPlayer = 1;
   board.length = 0;
   gameOver = false;
   updateHeight();
