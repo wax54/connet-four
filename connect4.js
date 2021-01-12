@@ -26,13 +26,14 @@ function handleClick(evt) {
 
   // get x from ID of clicked cell
   const x = +evt.target.id;
-  //the collumn top itself was clicked, return
+  //the collumn-top itself was clicked, return
   if (isNaN(x)) return;
   // get next spot in column (if none, ignore click)
   const y = findSpotForCol(x);
   if (y === null) {
     return;
   }
+
   // place piece in board and add to HTML table
   animatePiece(y, x);
   //update in-memory board
@@ -47,7 +48,7 @@ function handleClick(evt) {
 
   // check for tie
   if (checkForTie()) {
-    endGame('Both Players Tied');
+    endGame('Both Players Tied!');
   }
   // switch players
   currPlayer === 1 ? currPlayer = 2 : currPlayer = 1;
@@ -87,7 +88,7 @@ function handleMouseOut(evt) {
 function makeBoard() {
   //repeat this from 0 to HEIGHT
   repeat(HEIGHT, (y) => {
-    //a row for each row
+    //an array for each row
     board.push([]);
     //repeat this from 0 to WIDTH
     repeat(WIDTH, () => {
@@ -172,7 +173,6 @@ function findSpotForCol(x) {
     return row[x] == null ? y : accecptableRow;
   }, null);
 }
-
 
 /**
  * Animates the piece falling one cell at a time towards (y, x)
@@ -296,8 +296,6 @@ function checkForWin() {
 function dimensionsChanged() {
   //if the game hasn't started yet, update the board
   if (board.every((row) => row.every((cell) => cell == null))) {
-    updateHeight();
-    updateWidth();
     resetGame();
   } else {
     updateUserNote('Update Will Take Place Next Game.');
@@ -330,12 +328,12 @@ const playBlip = () => {
   const blip = new Audio('../Blip.mp3');
   blip.play()
 }
-/** plays a blip sound */
+/** plays a crash sound */
 const playCrash = () => {
   const crash = new Audio('../Slick.mp3');
   crash.play()
 };
-/** plays a blip sound */
+/** plays a xylophone sound */
 const playXylo = () => {
   const Xylo = new Audio('../Xylo.mp3');
   Xylo.play()
