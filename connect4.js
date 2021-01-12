@@ -8,7 +8,7 @@
 let WIDTH = 7;
 let HEIGHT = 6;
 let DROPSPEED = 200;
-
+let score = { 1: 0, 2: 0 };
 let currPlayer = 1; // active player: 1 or 2
 let gameOver = false;
 const board = []; // array of rows, each row is array of cells  (board[y][x])
@@ -120,47 +120,36 @@ function handleMouseOut(evt) {
  * Should make the pieces above an empty space fall
  */
 function updateBoard() {
-  //for everycolumn check if I hit a null after I hit a token
-  let previousRow = [];
-  const badColumns = new Set();
-  repeat(WIDTH, () => { previousRow.push(null) });
-
-  for (let y in board) {
-    for (let x in board[y]) {
-      if (previousRow[x] != null) {
-        if (board[y][x] === null) {
-          badColumns.add(x);
-        }
-      }
-    }
-    previousRow = [...board[y]];
-  }
-  if (badColumns.size) {
-    setTimeout(() => {
-      playBlip();
-      badColumns.forEach(resetColumn)
-    }, DROPSPEED);
-  }
+  removeSpaces();
 }
 
-function resetColumn(x) {
-  //y, x should be null with pieces above
-  const col = [];
-  for (y in board) {
-    if (board[y][x]) col.push(board[y][x]);
-    board[y][x] = null;
-    emptySpace(y, x);
-  }
+function updateHTMLBoard() {
+  playXylo();
+  board.forEach((row, y) => {
+    row.forEach((cell, x) => {
+      emptySpace(y, x);
+      if (cell) {
+        const piece = createSpecificPiece(cell);
+        addToTable(piece, y, x);
+      }
+    });
+  });
+}
 
-  for (let i = col.length - 1; i >= 0; i--) {
-    const y = findSpotForCol(x);
-    // place piece into HTML table
-    const piece = createSpecificPiece(col[i]);
-    addToTable(piece, y, x);
-    //update in-memory board
-    board[y][x] = currPlayer;
+function removeSpaces() {
+  let tempBoard = [];
+  for (let x = 0; x < WIDTH; x++) {
+    tempBoard[x] = [];
+    for (let y = 0; y < HEIGHT; y++) {
+      if (board[y][x] != null) { tempBoard[x].push(board[y][x]); }
+    }
   }
-
+  for (let x = 0; x < WIDTH; x++) {
+    for (let y = HEIGHT - 1; y >= 0; y--) {
+      if (tempBoard[x].length) board[y][x] = tempBoard[x].pop();
+      else board[y][x] = null;
+    }
+  }
 }
 
 /** findSpotForCol: given column x, return top empty y (null if filled) */
@@ -223,11 +212,9 @@ function emptySpace(y, x) {
  *
  *
  */
-function removeWinnerFromTable(winningPoints) {
-  playXylo();
+function removeWinnerFromBoard(winningPoints) {
   winningPoints.forEach(([y, x]) => {
     board[y][x] = null;
-    emptySpace(y, x);
   });
 
 }
@@ -264,11 +251,17 @@ function handleClick(evt) {
 
   // check for win
   if (checkForWin()) {
-    const winner = checkForWin(); //returns an array that contains all the points of the winner
-    setTimeout(() => {
-      removeWinnerFromTable(winner)
+    while (checkForWin()) {//returns an array that contains all the points of the winner
+      const winner = checkForWin();
+      //increment the score Board
+      score[board[winner[0][0]][winner[0][1]]]++;
+      //remove the winning arrangement from the inmemorry board
+      removeWinnerFromBoard(winner);
+      //drop all the pieces on the inmem board
       updateBoard();
-      //TODO: check for win again at the end
+    }
+    setTimeout(() => {
+      updateHTMLBoard();
     }, DROPSPEED * (y + 3));
   }
 
