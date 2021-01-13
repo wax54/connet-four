@@ -180,7 +180,7 @@ function findSpotForCol(x) {
  * @param {num} x the column the piece should end up in
  */
 function animatePiece(y, x) {
-  let i = 0; //counter variable
+  let currY = 0; //cur row Number
   const piece = createPiece(); //a piece of the currplayer color
   playBlip(); //play an initial blip
 
@@ -188,12 +188,12 @@ function animatePiece(y, x) {
   const animation = setInterval(() => {
     playBlip(); //a blip for evey square fallen
     piece.remove(); //remove the piece from the DOM if attached
-    addToTable(piece, i, x); //add the piece to the DOM at the specified cell
-    if (i === y) {  //if this cell is the destination cell...
+    addToTable(piece, currY, x); //add the piece to the DOM at the specified cell
+    if (currY === y) {  //if this cell is the destination cell...
       clearInterval(animation); //stop the animation, we have arrived
       playCrash(); //play a crash to show we arrived
     }
-    i++; //increment our descent
+    currY++; //increment our descent
   }, DROPSPEED);
 }
 
