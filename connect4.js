@@ -180,9 +180,10 @@ function findSpotForCol(x) {
  * @param {num} x the column the piece should end up in
  */
 function animatePiece(y, x) {
+  playBlip(); //play an initial blip
   let currY = 0; //cur row Number
   const piece = createPiece(); //a piece of the currplayer color
-  playBlip(); //play an initial blip
+
 
   //repeat every DROPSPEED
   const animation = setInterval(() => {
